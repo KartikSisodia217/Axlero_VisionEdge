@@ -1,10 +1,10 @@
-def main():
-    print("=" * 50)
-    print(" VisionEdge Project Initialized ")
-    print("=" * 50)
-    print("Project Status : Development Started")
-    print("Role           : Project Lead & System Architect")
-    print("=" * 50)
+from fastapi import FastAPI
+from backend.api.v1.health import router as health_router
 
-if __name__ == "__main__":
-    main()
+app = FastAPI(
+    title="VisionEdge API",
+    description="Hardware-Accelerated Video Pipeline Backend",
+    version="1.0.0"
+)
+
+app.include_router(health_router)
