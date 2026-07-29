@@ -1,5 +1,6 @@
+visionedge.db
+*.db
 __pycache__/
 venv/
 .env
-*.pyc
 .DS_Store
