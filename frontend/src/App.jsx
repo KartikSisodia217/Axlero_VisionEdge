@@ -1,14 +1,23 @@
 import { useEffect, useState } from "react";
+import "./App.css";
 
 function App() {
   const [users, setUsers] = useState([]);
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
+  const [search, setSearch] = useState("");
 
-  const fetchUsers = () => {
-    fetch("http://127.0.0.1:8000/api/v1/users")
-      .then((res) => res.json())
-      .then((data) => setUsers(data));
+  const [editingId, setEditingId] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
+
+  const fetchUsers = async () => {
+    try {
+      const response = await fetch("http://127.0.0.1:8000/api/v1/users");
+      const data = await response.json();
+      setUsers(data);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   useEffect(() => {
@@ -32,16 +41,67 @@ function App() {
       setEmail("");
       fetchUsers();
     } else {
-      alert("User already exists or invalid data.");
+      alert("User already exists.");
+    }
+  };
+
+  const updateUser = async () => {
+    const response = await fetch(
+      `http://127.0.0.1:8000/api/v1/users/${editingId}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          full_name: fullName,
+          email: email,
+          is_active: true,
+        }),
+      }
+    );
+
+    if (response.ok) {
+      setEditingId(null);
+      setIsEditing(false);
+      setFullName("");
+      setEmail("");
+      fetchUsers();
+    } else {
+      alert("Update failed.");
+    }
+  };
+
+  const deleteUser = async (id) => {
+    if (!window.confirm("Delete this user?")) return;
+
+    const response = await fetch(
+      `http://127.0.0.1:8000/api/v1/users/${id}`,
+      {
+        method: "DELETE",
+      }
+    );
+
+    if (response.ok) {
+      fetchUsers();
     }
   };
 
   return (
-    <div style={{ padding: "30px", fontFamily: "Arial" }}>
-      <h1>VisionEdge Users</h1>
+    <div className="container">
+      <h1>VisionEdge User Management</h1>
 
-      <div style={{ marginBottom: "20px" }}>
+      <input
+        className="search-box"
+        type="text"
+        placeholder="Search by name..."
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+      />
+
+      <div className="form-row">
         <input
+          className="form-control"
           type="text"
           placeholder="Full Name"
           value={fullName}
@@ -49,40 +109,79 @@ function App() {
         />
 
         <input
+          className="form-control"
           type="email"
-          placeholder="Email"
+          placeholder="Email Address"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          style={{ marginLeft: "10px" }}
         />
 
         <button
-          onClick={createUser}
-          style={{ marginLeft: "10px" }}
+          className="add-btn"
+          onClick={isEditing ? updateUser : createUser}
         >
-          Add User
+          {isEditing ? "Update User" : "Add User"}
         </button>
       </div>
 
-      <table border="1" cellPadding="10">
+      <table>
         <thead>
           <tr>
             <th>ID</th>
-            <th>Name</th>
+            <th>Full Name</th>
             <th>Email</th>
             <th>Status</th>
+            <th>Actions</th>
           </tr>
         </thead>
 
         <tbody>
-          {users.map((user) => (
-            <tr key={user.id}>
-              <td>{user.id}</td>
-              <td>{user.full_name}</td>
-              <td>{user.email}</td>
-              <td>{user.is_active ? "Active" : "Inactive"}</td>
-            </tr>
-          ))}
+          {users
+            .filter((user) =>
+              user.full_name.toLowerCase().includes(search.toLowerCase())
+            )
+            .map((user) => (
+              <tr key={user.id}>
+                <td>{user.id}</td>
+
+                <td>{user.full_name}</td>
+
+                <td>{user.email}</td>
+
+                <td>
+                  <span
+                    className={
+                      user.is_active
+                        ? "status-active"
+                        : "status-inactive"
+                    }
+                  >
+                    {user.is_active ? "Active" : "Inactive"}
+                  </span>
+                </td>
+
+                <td>
+                  <button
+                    className="edit-btn"
+                    onClick={() => {
+                      setEditingId(user.id);
+                      setFullName(user.full_name);
+                      setEmail(user.email);
+                      setIsEditing(true);
+                    }}
+                  >
+                    Edit
+                  </button>
+
+                  <button
+                    className="delete-btn"
+                    onClick={() => deleteUser(user.id)}
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))}
         </tbody>
       </table>
     </div>
