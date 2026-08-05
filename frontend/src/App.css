@@ -1,99 +1,177 @@
-body {
+/* -------------------- GLOBAL -------------------- */
+
+* {
   margin: 0;
-  background: #f4f6f9;
-  font-family: Arial, Helvetica, sans-serif;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-.container {
-  width: 90%;
-  max-width: 1100px;
-  margin: 40px auto;
+body {
+  background: #f4f7fb;
+  font-family: "Inter", sans-serif;
+  color: #1f2937;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+/* -------------------- SCROLLBAR -------------------- */
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #eef2f7;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #bfc8d4;
+  border-radius: 20px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* -------------------- CARD -------------------- */
+
+.card {
   background: white;
+  border-radius: 18px;
+  padding: 24px;
+  transition: all 0.35s ease;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 18px 35px rgba(37, 99, 235, 0.18);
+}
+
+/* -------------------- DASHBOARD -------------------- */
+
+.dashboard-container {
   padding: 25px;
-  border-radius: 10px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
-h1 {
-  text-align: center;
-  color: #2c3e50;
+.dashboard-title {
+  font-size: 34px;
+  font-weight: 700;
+  color: #111827;
 }
 
-.search-box,
-.form-control {
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
+.dashboard-subtitle {
+  margin-top: 5px;
+  color: #6b7280;
 }
 
-.search-box {
-  width: 250px;
-  margin-bottom: 20px;
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+  margin-top: 25px;
 }
 
-.form-row {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 20px;
+.chart-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 24px;
+  margin-top: 24px;
 }
 
-.form-control {
-  flex: 1;
+.bottom-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+  margin-top: 24px;
 }
 
-button {
-  border: none;
-  padding: 10px 16px;
-  border-radius: 6px;
-  cursor: pointer;
-  color: white;
-  font-weight: bold;
-}
-
-.add-btn {
-  background: #1976d2;
-}
-
-.edit-btn {
-  background: #f39c12;
-}
-
-.delete-btn {
-  background: #e74c3c;
-  margin-left: 8px;
-}
-
-button:hover {
-  opacity: 0.9;
-}
+/* -------------------- TABLE -------------------- */
 
 table {
   width: 100%;
-  border-collapse: collapse;
 }
 
 th {
-  background: #1976d2;
-  color: white;
+  background: #f8fafc;
+  font-weight: 700;
 }
 
-th,
-td {
-  border: 1px solid #ddd;
-  padding: 12px;
-  text-align: center;
+td,
+th {
+  padding: 14px;
 }
 
-tr:nth-child(even) {
-  background: #f8f8f8;
+/* -------------------- BUTTON -------------------- */
+
+button {
+  transition: all 0.25s ease;
 }
 
-.status-active {
-  color: green;
-  font-weight: bold;
+button:hover {
+  transform: translateY(-2px);
 }
 
-.status-inactive {
-  color: red;
-  font-weight: bold;
+/* -------------------- INPUT -------------------- */
+
+input {
+  transition: all 0.3s ease;
+}
+
+input:focus {
+  outline: none;
+}
+
+/* -------------------- GLASS CARD -------------------- */
+
+.glass {
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+/* -------------------- FADE -------------------- */
+
+.fade {
+  animation: fadeIn 0.6s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* -------------------- RESPONSIVE -------------------- */
+
+@media (max-width: 1200px) {
+  .dashboard-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .chart-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-container {
+    padding: 15px;
+  }
+
+  .dashboard-title {
+    font-size: 26px;
+  }
 }

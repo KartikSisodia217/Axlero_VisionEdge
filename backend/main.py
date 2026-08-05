@@ -1,16 +1,18 @@
 import backend.models
 
 from fastapi import FastAPI
-
 from fastapi.middleware.cors import CORSMiddleware
 
 from backend.api.v1.health import router as health_router
 from backend.api.v1.users import router as users_router
+from backend.api.v1.auth import router as auth_router
+from backend.api.v1.dashboard import router as dashboard_router
+from backend.api.v1.streams import router as streams_router
+
 from backend.core.database import Base, engine
 from backend.core.exceptions import register_exception_handlers
 from backend.core.logging import logger
 
-# Create database tables
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
@@ -18,6 +20,7 @@ app = FastAPI(
     description="Hardware Accelerated Video Pipeline Backend",
     version="1.0.0",
 )
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
@@ -28,11 +31,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Register API routes
 app.include_router(health_router)
 app.include_router(users_router)
+app.include_router(auth_router)
+app.include_router(dashboard_router)
+app.include_router(streams_router)
 
-# Register exception handlers
 register_exception_handlers(app)
 
 
