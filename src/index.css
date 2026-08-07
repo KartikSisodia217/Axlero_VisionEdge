@@ -1,0 +1,71 @@
+:root {
+  /* --- Color tokens: NOC wall / phosphor-CRT surveillance theme --- */
+  --bg: #0a0f0c;
+  --panel: #10160f;
+  --panel-raised: #141b13;
+  --grid-line: #1e2a1c;
+  --phosphor: #5ffb9a;
+  --phosphor-dim: #2f7a52;
+  --phosphor-glow: rgba(95, 251, 154, 0.25);
+  --amber: #ffb454;
+  --red-alert: #ff5c5c;
+  --text-primary: #e8f5ec;
+  --text-muted: #7fa08d;
+  --text-faint: #4b6155;
+
+  /* --- Type tokens --- */
+  --font-display: "IBM Plex Sans Condensed", sans-serif;
+  --font-data: "IBM Plex Mono", "SFMono-Regular", monospace;
+
+  --radius: 3px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text-primary);
+  font-family: var(--font-data);
+}
+
+#root {
+  min-height: 100vh;
+  background-image:
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: 28px 28px;
+  background-position: -1px -1px;
+}
+
+button {
+  font-family: var(--font-data);
+  cursor: pointer;
+}
+
+a {
+  color: var(--phosphor);
+}
+
+::selection {
+  background: var(--phosphor-dim);
+  color: var(--bg);
+}
+
+/* Respect reduced motion preference throughout the dashboard */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* Visible keyboard focus, consistent with a control-room / accessibility-first tool */
+:focus-visible {
+  outline: 2px solid var(--phosphor);
+  outline-offset: 2px;
+}
