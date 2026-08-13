@@ -1,55 +1,56 @@
-const API_URL = "http://127.0.0.1:8000/api/v1/streams";
+import api from "./api";
 
-export async function getStreams() {
-  const response = await fetch(API_URL);
+const streamService = {
+  // Get all streams
+  getStreams: async () => {
+    const response = await api.get("/streams/");
+    return response.data;
+  },
 
-  if (!response.ok) {
-    throw new Error("Failed to fetch streams");
-  }
+  // Get a single stream
+  getStream: async (streamId) => {
+    const response = await api.get(`/streams/${streamId}`);
+    return response.data;
+  },
 
-  return await response.json();
-}
+  // Create a new stream
+  createStream: async (streamData) => {
+    const response = await api.post("/streams/", streamData);
+    return response.data;
+  },
 
-export async function createStream(stream) {
-  const response = await fetch(`${API_URL}/`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(stream),
-  });
+  // Update an existing stream
+  updateStream: async (streamId, streamData) => {
+    const response = await api.put(
+      `/streams/${streamId}`,
+      streamData
+    );
+    return response.data;
+  },
 
-  if (!response.ok) {
-    throw new Error("Failed to create stream");
-  }
+  // Start stream
+  startStream: async (streamId) => {
+    const response = await api.post(
+      `/streams/${streamId}/start`
+    );
+    return response.data;
+  },
 
-  return await response.json();
-}
+  // Stop stream
+  stopStream: async (streamId) => {
+    const response = await api.post(
+      `/streams/${streamId}/stop`
+    );
+    return response.data;
+  },
 
-export async function updateStream(id, stream) {
-  const response = await fetch(`${API_URL}/${id}`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(stream),
-  });
+  // Delete stream
+  deleteStream: async (streamId) => {
+    const response = await api.delete(
+      `/streams/${streamId}`
+    );
+    return response.data;
+  },
+};
 
-  if (!response.ok) {
-    throw new Error("Failed to update stream");
-  }
-
-  return await response.json();
-}
-
-export async function deleteStream(id) {
-  const response = await fetch(`${API_URL}/${id}`, {
-    method: "DELETE",
-  });
-
-  if (!response.ok) {
-    throw new Error("Failed to delete stream");
-  }
-
-  return await response.json();
-}
+export default streamService;

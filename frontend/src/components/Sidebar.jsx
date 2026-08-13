@@ -1,180 +1,281 @@
-import DashboardIcon from "@mui/icons-material/Dashboard";
-import PeopleIcon from "@mui/icons-material/People";
-import VideocamIcon from "@mui/icons-material/Videocam";
-import AnalyticsIcon from "@mui/icons-material/Analytics";
-import ArticleIcon from "@mui/icons-material/Article";
-import SettingsIcon from "@mui/icons-material/Settings";
-import LogoutIcon from "@mui/icons-material/Logout";
+import React from "react";
 
 import {
-  Avatar,
   Box,
-  Divider,
-  List,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
   Typography,
 } from "@mui/material";
 
-function Sidebar({ activePage, setActivePage }) {
-  const menuItems = [
-    {
-      id: "dashboard",
-      text: "Dashboard",
-      icon: <DashboardIcon />,
-    },
-    {
-      id: "users",
-      text: "Users",
-      icon: <PeopleIcon />,
-    },
-    {
-      id: "streams",
-      text: "Streams",
-      icon: <VideocamIcon />,
-    },
-    {
-      id: "analytics",
-      text: "Analytics",
-      icon: <AnalyticsIcon />,
-    },
-    {
-      id: "logs",
-      text: "Logs",
-      icon: <ArticleIcon />,
-    },
-    {
-      id: "settings",
-      text: "Settings",
-      icon: <SettingsIcon />,
-    },
-  ];
+import DashboardRoundedIcon from "@mui/icons-material/DashboardRounded";
+import VideocamRoundedIcon from "@mui/icons-material/VideocamRounded";
+import CameraAltRoundedIcon from "@mui/icons-material/CameraAltRounded";
+import NotificationsRoundedIcon from "@mui/icons-material/NotificationsRounded";
+import DescriptionRoundedIcon from "@mui/icons-material/DescriptionRounded";
+import TimelineRoundedIcon from "@mui/icons-material/TimelineRounded";
+import SettingsRoundedIcon from "@mui/icons-material/SettingsRounded";
+import PersonRoundedIcon from "@mui/icons-material/PersonRounded";
 
+const menuItems = [
+  {
+    label: "Dashboard",
+    page: "dashboard",
+    icon: <DashboardRoundedIcon />,
+  },
+  {
+    label: "Stream Management",
+    page: "streams",
+    icon: <VideocamRoundedIcon />,
+  },
+  {
+    label: "Camera Monitoring",
+    page: "camera-monitoring",
+    icon: <CameraAltRoundedIcon />,
+  },
+  {
+    label: "Security Alerts",
+    page: "security-alerts",
+    icon: <NotificationsRoundedIcon />,
+  },
+  {
+    label: "Activity & Logs",
+    page: "activity-logs",
+    icon: <DescriptionRoundedIcon />,
+  },
+  {
+    label: "Real-Time Monitoring",
+    page: "real-time-monitoring",
+    icon: <TimelineRoundedIcon />,
+  },
+  {
+    label: "Settings",
+    page: "settings",
+    icon: <SettingsRoundedIcon />,
+  },
+  {
+    label: "User",
+    page: "user",
+    icon: <PersonRoundedIcon />,
+  },
+];
+
+function Sidebar({
+  activePage,
+  setActivePage,
+}) {
   return (
     <Box
       sx={{
         width: 260,
-        bgcolor: "#111827",
-        color: "#fff",
+        flexShrink: 0,
+        minHeight: "100vh",
+
         display: "flex",
         flexDirection: "column",
-        justifyContent: "space-between",
-        minHeight: "100vh",
+
+        bgcolor: "background.paper",
+
+        borderRight: 1,
+        borderColor: "divider",
+
+        color: "text.primary",
+
+        transition:
+          "background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease",
       }}
     >
-      <Box>
+      {/* =====================================================
+          LOGO
+      ====================================================== */}
 
+      <Box
+        sx={{
+          px: 3,
+          py: 3,
+        }}
+      >
         <Typography
-          variant="h5"
-          align="center"
           sx={{
-            py: 4,
-            fontWeight: "bold",
-            letterSpacing: 1,
+            fontSize: "1.6rem",
+            fontWeight: 900,
+            color: "text.primary",
+
+            transition: "color 0.25s ease",
           }}
         >
           VisionEdge
         </Typography>
 
-        <Divider sx={{ bgcolor: "#374151" }} />
+        <Typography
+          sx={{
+            mt: 0.5,
+            fontSize: "0.8rem",
+            color: "text.secondary",
 
-        <List sx={{ mt: 2 }}>
+            transition: "color 0.25s ease",
+          }}
+        >
+          AI Video Intelligence
+        </Typography>
+      </Box>
 
-          {menuItems.map((item) => (
+      {/* =====================================================
+          MENU
+      ====================================================== */}
 
-            <ListItemButton
-              key={item.id}
-              selected={activePage === item.id}
-              onClick={() => setActivePage(item.id)}
+      <Box
+        sx={{
+          px: 1,
+          pb: 2,
+        }}
+      >
+        {menuItems.map((item) => {
+          const isActive =
+            activePage === item.page;
+
+          return (
+            <Box
+              key={item.page}
+              onClick={() =>
+                setActivePage(item.page)
+              }
               sx={{
-                mx: 1,
-                mb: 1,
-                borderRadius: 2,
+                display: "flex",
+                alignItems: "center",
 
-                "&.Mui-selected": {
-                  bgcolor: "#2563eb",
-                },
+                gap: 2,
 
-                "&.Mui-selected:hover": {
-                  bgcolor: "#2563eb",
-                },
+                px: 2,
+                py: 1.5,
+
+                mb: 0.7,
+
+                borderRadius: 3,
+
+                cursor: "pointer",
+
+                userSelect: "none",
+
+                bgcolor: isActive
+                  ? "primary.main"
+                  : "transparent",
+
+                color: isActive
+                  ? "#FFFFFF"
+                  : "text.secondary",
+
+                transition:
+                  "background-color 0.2s ease, color 0.2s ease, transform 0.15s ease",
 
                 "&:hover": {
-                  bgcolor: "#1f2937",
+                  bgcolor: isActive
+                    ? "primary.main"
+                    : "action.hover",
+
+                  color: isActive
+                    ? "#FFFFFF"
+                    : "text.primary",
+                },
+
+                "&:active": {
+                  transform: "scale(0.99)",
                 },
               }}
             >
-              <ListItemIcon sx={{ color: "#fff" }}>
+              {/* ICON */}
+
+              <Box
+                sx={{
+                  width: 24,
+                  height: 24,
+
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+
+                  flexShrink: 0,
+
+                  color: "inherit",
+
+                  "& svg": {
+                    fontSize: 22,
+                  },
+                }}
+              >
                 {item.icon}
-              </ListItemIcon>
+              </Box>
 
-              <ListItemText primary={item.text} />
+              {/* LABEL */}
 
-            </ListItemButton>
+              <Typography
+                sx={{
+                  fontSize: "0.95rem",
 
-          ))}
+                  fontWeight: isActive
+                    ? 700
+                    : 500,
 
-        </List>
+                  color: "inherit",
 
+                  lineHeight: 1.3,
+
+                  transition:
+                    "color 0.2s ease",
+                }}
+              >
+                {item.label}
+              </Typography>
+            </Box>
+          );
+        })}
       </Box>
 
-      <Box sx={{ p: 3 }}>
+      {/* =====================================================
+          SPACER
+      ====================================================== */}
 
-        <Divider sx={{ bgcolor: "#374151", mb: 3 }} />
+      <Box sx={{ flex: 1 }} />
 
-        <Box
+      {/* =====================================================
+          FOOTER
+      ====================================================== */}
+
+      <Box
+        sx={{
+          px: 3,
+          py: 2,
+
+          borderTop: 1,
+          borderColor: "divider",
+
+          bgcolor: "background.paper",
+
+          transition:
+            "background-color 0.25s ease, border-color 0.25s ease",
+        }}
+      >
+        <Typography
           sx={{
-            display: "flex",
-            alignItems: "center",
-            gap: 2,
+            fontSize: "0.72rem",
+            color: "text.secondary",
+
+            transition: "color 0.25s ease",
           }}
         >
-          <Avatar
-            sx={{
-              bgcolor: "#2563eb",
-            }}
-          >
-            R
-          </Avatar>
+          VisionEdge Platform
+        </Typography>
 
-          <Box>
-
-            <Typography fontWeight="bold">
-              Rajesh Reddy
-            </Typography>
-
-            <Typography
-              variant="body2"
-              color="#9CA3AF"
-            >
-              Administrator
-            </Typography>
-
-          </Box>
-
-        </Box>
-
-        <ListItemButton
+        <Typography
           sx={{
-            mt: 3,
-            borderRadius: 2,
+            fontSize: "0.72rem",
+            color: "text.disabled",
 
-            "&:hover": {
-              bgcolor: "#1f2937",
-            },
+            mt: 0.3,
+
+            transition: "color 0.25s ease",
           }}
         >
-          <ListItemIcon sx={{ color: "#fff" }}>
-            <LogoutIcon />
-          </ListItemIcon>
-
-          <ListItemText primary="Logout" />
-
-        </ListItemButton>
-
+          Version 1.0.0
+        </Typography>
       </Box>
-
     </Box>
   );
 }

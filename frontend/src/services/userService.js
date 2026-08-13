@@ -1,55 +1,96 @@
-const API_URL = "http://127.0.0.1:8000/api/v1/users";
+import api from "./api";
 
-export async function getUsers() {
-  const response = await fetch(API_URL);
+const userService = {
+  getUsers: async () => {
+    try {
+      const response = await api.get("/users/");
 
-  if (!response.ok) {
-    throw new Error("Failed to fetch users");
-  }
+      console.log("USERS API RESPONSE:", response.data);
 
-  return await response.json();
-}
+      return response.data;
+    } catch (error) {
+      console.error(
+        "GET USERS ERROR:",
+        error.response?.data || error.message
+      );
 
-export async function createUser(user) {
-  const response = await fetch(`${API_URL}/`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(user),
-  });
+      throw error;
+    }
+  },
 
-  if (!response.ok) {
-    throw new Error("Failed to create user");
-  }
+  getUser: async (userId) => {
+    try {
+      const response = await api.get(`/users/${userId}`);
 
-  return await response.json();
-}
+      console.log("USER API RESPONSE:", response.data);
 
-export async function updateUser(id, user) {
-  const response = await fetch(`${API_URL}/${id}`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(user),
-  });
+      return response.data;
+    } catch (error) {
+      console.error(
+        `GET USER ${userId} ERROR:`,
+        error.response?.data || error.message
+      );
 
-  if (!response.ok) {
-    throw new Error("Failed to update user");
-  }
+      throw error;
+    }
+  },
 
-  return await response.json();
-}
+  createUser: async (user) => {
+    try {
+      const response = await api.post("/users/", user);
 
-export async function deleteUser(id) {
-  const response = await fetch(`${API_URL}/${id}`, {
-    method: "DELETE",
-  });
+      console.log("CREATE USER RESPONSE:", response.data);
 
-  if (!response.ok) {
-    throw new Error("Failed to delete user");
-  }
+      return response.data;
+    } catch (error) {
+      console.error(
+        "CREATE USER ERROR:",
+        error.response?.data || error.message
+      );
 
-  return await response.json();
-}
+      throw error;
+    }
+  },
+
+  updateUser: async (userId, user) => {
+    try {
+      const response = await api.put(
+        `/users/${userId}`,
+        user
+      );
+
+      console.log("UPDATE USER RESPONSE:", response.data);
+
+      return response.data;
+    } catch (error) {
+      console.error(
+        `UPDATE USER ${userId} ERROR:`,
+        error.response?.data || error.message
+      );
+
+      throw error;
+    }
+  },
+
+  deleteUser: async (userId) => {
+    try {
+      const response = await api.delete(
+        `/users/${userId}`
+      );
+
+      console.log("DELETE USER RESPONSE:", response.data);
+
+      return response.data;
+    } catch (error) {
+      console.error(
+        `DELETE USER ${userId} ERROR:`,
+        error.response?.data || error.message
+      );
+
+      throw error;
+    }
+  },
+};
+
+export default userService;
+export { userService };

@@ -1,592 +1,298 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import {
   Alert,
   Box,
   Button,
-  Chip,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  Paper,
-  Snackbar,
+  CircularProgress,
+  Grid,
+  InputAdornment,
   TextField,
   Typography,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  IconButton,
 } from "@mui/material";
 
 import AddIcon from "@mui/icons-material/Add";
+import SearchIcon from "@mui/icons-material/Search";
+import RefreshIcon from "@mui/icons-material/Refresh";
 
-import {
-  createStream,
-  deleteStream,
-  getStreams,
-  updateStream,
-} from "../services/streamService";
+import StreamCard from "./StreamCard";
+import streamsService from "../services/streamsService";
 
 function StreamManagement() {
-
   const [streams, setStreams] = useState([]);
-
-  const [filteredStreams, setFilteredStreams] = useState([]);
-
-  const [loading, setLoading] = useState(false);
-
   const [search, setSearch] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [actionLoading, setActionLoading] = useState(null);
 
-  const [open, setOpen] = useState(false);
+  const loadStreams = async () => {
+    try {
+      setLoading(true);
+      setError("");
 
-  const [editingStream, setEditingStream] = useState(null);
+      const data = await streamsService.getStreams();
 
-  const [formData, setFormData] = useState({
+      console.log("STREAM MANAGEMENT DATA:", data);
 
-    name: "",
-
-    rtsp_url: "",
-
-    status: "Running",
-
-  });
-
-  const [snackbar, setSnackbar] = useState({
-
-    open: false,
-
-    severity: "success",
-
-    message: "",
-
-  });
+      if (Array.isArray(data)) {
+        setStreams(data);
+      } else {
+        setStreams([]);
+      }
+    } catch (err) {
+      console.error("Failed to load streams:", err);
+      setError("Failed to load camera streams.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-
     loadStreams();
-
   }, []);
 
-  useEffect(() => {
+  const filteredStreams = useMemo(() => {
+    const query = search.toLowerCase().trim();
 
-    filterStreams();
+    if (!query) {
+      return streams;
+    }
 
+    return streams.filter((stream) => {
+      return (
+        stream.camera_name
+          ?.toLowerCase()
+          .includes(query) ||
+        stream.rtsp_url
+          ?.toLowerCase()
+          .includes(query) ||
+        stream.resolution
+          ?.toLowerCase()
+          .includes(query)
+      );
+    });
   }, [streams, search]);
 
-  async function loadStreams() {
+  console.log("🔥 NEW STREAM MANAGEMENT COMPONENT LOADED");
+  console.log("🔥 STREAMS:", streams);
 
-    setLoading(true);
-
+  const handleStart = async (streamId) => {
     try {
+      setActionLoading(streamId);
 
-      const data = await getStreams();
+      await streamsService.startStream(streamId);
 
-      setStreams(data);
+      await loadStreams();
+    } catch (err) {
+      console.error("Start stream error:", err);
 
-      setFilteredStreams(data);
-
+      setError(
+        err?.message || "Failed to start stream."
+      );
+    } finally {
+      setActionLoading(null);
     }
+  };
 
-    catch (error) {
-
-      console.error(error);
-
-    }
-
-    setLoading(false);
-
-  }
-
-  function filterStreams() {
-
-    if (search.trim() === "") {
-
-      setFilteredStreams(streams);
-
-      return;
-
-    }
-
-    const result = streams.filter((stream) =>
-
-      stream.name
-        .toLowerCase()
-        .includes(search.toLowerCase()) ||
-
-      stream.rtsp_url
-        .toLowerCase()
-        .includes(search.toLowerCase())
-
-    );
-
-    setFilteredStreams(result);
-
-  }
-
-  function handleOpenCreate() {
-
-    setEditingStream(null);
-
-    setFormData({
-
-      name: "",
-
-      rtsp_url: "",
-
-      status: "Running",
-
-    });
-
-    setOpen(true);
-
-  }
-
-  function handleEdit(stream) {
-
-    setEditingStream(stream);
-
-    setFormData({
-
-      name: stream.name,
-
-      rtsp_url: stream.rtsp_url,
-
-      status: stream.status,
-
-    });
-
-    setOpen(true);
-
-  }
-
-  function handleClose() {
-
-    setOpen(false);
-
-  }
-
-  async function handleSave() {
-
+  const handleStop = async (streamId) => {
     try {
+      setActionLoading(streamId);
 
-      if (editingStream) {
+      await streamsService.stopStream(streamId);
 
-        await updateStream(
-          editingStream.id,
-          formData
-        );
+      await loadStreams();
+    } catch (err) {
+      console.error("Stop stream error:", err);
 
-        setSnackbar({
-
-          open: true,
-
-          severity: "success",
-
-          message: "Stream Updated",
-
-        });
-
-      }
-
-      else {
-
-        await createStream(formData);
-
-        setSnackbar({
-
-          open: true,
-
-          severity: "success",
-
-          message: "Stream Created",
-
-        });
-
-      }
-
-      loadStreams();
-
-      handleClose();
-
+      setError(
+        err?.message || "Failed to stop stream."
+      );
+    } finally {
+      setActionLoading(null);
     }
-
-    catch (error) {
-
-      console.error(error);
-
-      setSnackbar({
-
-        open: true,
-
-        severity: "error",
-
-        message: "Operation Failed",
-
-      });
-
-    }
-
-  }
-
-  async function handleDelete(id) {
-
-    if (!window.confirm("Delete this stream?")) {
-
-      return;
-
-    }
-
-    try {
-
-      await deleteStream(id);
-
-      loadStreams();
-
-      setSnackbar({
-
-        open: true,
-
-        severity: "success",
-
-        message: "Stream Deleted",
-
-      });
-
-    }
-
-    catch (error) {
-
-      console.error(error);
-
-    }
-
-  }
-
-  function handleSnackbarClose() {
-
-    setSnackbar({
-
-      ...snackbar,
-
-      open: false,
-
-    });
-
-  }
+  };
 
   return (
-
-    <>
+    <Box
+      sx={{
+        width: "100%",
+        minHeight: "100vh",
+        backgroundColor: "#F8FAFC",
+        p: {
+          xs: 2,
+          md: 4,
+        },
+      }}
+    >
+      {/* HEADER */}
 
       <Box
-  sx={{
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    mb: 4,
-    flexWrap: "wrap",
-    gap: 2,
-  }}
->
-  <Box>
-    <Typography
-      variant="h4"
-      sx={{
-        fontWeight: 700,
-        color: "#111827",
-      }}
-    >
-      Stream Management
-    </Typography>
-
-    <Typography
-      sx={{
-        color: "#6B7280",
-        mt: 0.5,
-      }}
-    >
-      Manage RTSP video streams
-    </Typography>
-  </Box>
-
-  <Button
-    variant="contained"
-    startIcon={<AddIcon />}
-    onClick={handleOpenCreate}
-    sx={{
-      px: 3.5,
-      py: 1.2,
-      borderRadius: "14px",
-      textTransform: "none",
-      fontWeight: 600,
-      background:
-        "linear-gradient(90deg,#2563EB,#3B82F6)",
-
-      "&:hover": {
-        background:
-          "linear-gradient(90deg,#1D4ED8,#2563EB)",
-        transform: "translateY(-2px)",
-      },
-    }}
-  >
-    Add Stream
-  </Button>
-</Box>
-
-      <Paper
         sx={{
-          p: 2,
-          mb: 3,
-          borderRadius: 3,
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: {
+            xs: "flex-start",
+            md: "center",
+          },
+          flexDirection: {
+            xs: "column",
+            md: "row",
+          },
+          gap: 2,
+          mb: 4,
         }}
       >
+        <Box>
+          <Typography
+            variant="h4"
+            fontWeight={800}
+            color="#0F172A"
+          >
+            Live Camera Monitoring
+          </Typography>
 
-        <TextField
-          fullWidth
-          placeholder="Search Stream..."
-          value={search}
-          onChange={(e) =>
-            setSearch(e.target.value)
-          }
-        />
+          <Typography
+            color="text.secondary"
+            sx={{ mt: 0.5 }}
+          >
+            AI Powered Video Stream Management
+          </Typography>
+        </Box>
 
-      </Paper>
-
-      <Dialog
-        open={open}
-        onClose={handleClose}
-        maxWidth="sm"
-        fullWidth
-      >
-
-        <DialogTitle>
-
-          {editingStream
-            ? "Edit Stream"
-            : "Create Stream"}
-
-        </DialogTitle>
-
-        <DialogContent>
-
-          <TextField
-            fullWidth
-            margin="normal"
-            label="Stream Name"
-            value={formData.name}
-            onChange={(e) =>
-              setFormData({
-                ...formData,
-                name: e.target.value,
-              })
-            }
-          />
-
-          <TextField
-            fullWidth
-            margin="normal"
-            label="RTSP URL"
-            value={formData.rtsp_url}
-            onChange={(e) =>
-              setFormData({
-                ...formData,
-                rtsp_url: e.target.value,
-              })
-            }
-          />
-
-          <TextField
-            fullWidth
-            margin="normal"
-            label="Status"
-            value={formData.status}
-            onChange={(e) =>
-              setFormData({
-                ...formData,
-                status: e.target.value,
-              })
-            }
-          />
-
-        </DialogContent>
-
-        <DialogActions>
-
-          <Button onClick={handleClose}>
-            Cancel
+        <Box
+          sx={{
+            display: "flex",
+            gap: 1,
+          }}
+        >
+          <Button
+            variant="outlined"
+            startIcon={<RefreshIcon />}
+            onClick={loadStreams}
+            disabled={loading}
+            sx={{
+              borderRadius: 3,
+              textTransform: "none",
+              fontWeight: 700,
+            }}
+          >
+            Refresh
           </Button>
 
           <Button
             variant="contained"
-            onClick={handleSave}
+            startIcon={<AddIcon />}
+            sx={{
+              borderRadius: 3,
+              textTransform: "none",
+              px: 3,
+              boxShadow: "none",
+            }}
           >
-            {editingStream
-              ? "Update"
-              : "Create"}
+            Add Camera
           </Button>
+        </Box>
+      </Box>
 
-        </DialogActions>
+      {/* SEARCH */}
 
-      </Dialog>
-            <Paper
-        elevation={3}
-        sx={{
-          borderRadius: 3,
-          overflow: "hidden",
+      <TextField
+        fullWidth
+        value={search}
+        onChange={(event) =>
+          setSearch(event.target.value)
+        }
+        placeholder="Search cameras..."
+        InputProps={{
+          startAdornment: (
+            <InputAdornment position="start">
+              <SearchIcon color="action" />
+            </InputAdornment>
+          ),
         }}
-      >
+        sx={{
+          mb: 4,
+          bgcolor: "#fff",
+        }}
+      />
 
-        <TableContainer>
+      {/* ERROR */}
 
-          <Table>
-
-            <TableHead>
-
-              <TableRow>
-
-                <TableCell>
-                  <b>ID</b>
-                </TableCell>
-
-                <TableCell>
-                  <b>Stream Name</b>
-                </TableCell>
-
-                <TableCell>
-                  <b>RTSP URL</b>
-                </TableCell>
-
-                <TableCell>
-                  <b>Status</b>
-                </TableCell>
-
-                <TableCell align="center">
-                  <b>Actions</b>
-                </TableCell>
-
-              </TableRow>
-
-            </TableHead>
-
-            <TableBody>
-
-              {loading ? (
-
-                <TableRow>
-
-                  <TableCell
-                    colSpan={5}
-                    align="center"
-                  >
-                    Loading...
-                  </TableCell>
-
-                </TableRow>
-
-              ) : (
-
-                filteredStreams.map((stream) => (
-
-                  <TableRow
-                    key={stream.id}
-                    hover
-                  >
-
-                    <TableCell>
-                      {stream.id}
-                    </TableCell>
-
-                    <TableCell>
-                      {stream.name}
-                    </TableCell>
-
-                    <TableCell>
-                      {stream.rtsp_url}
-                    </TableCell>
-
-                    <TableCell>
-
-                      <Chip
-                        label={stream.status}
-                        color={
-                          stream.status === "Running"
-                            ? "success"
-                            : stream.status === "Stopped"
-                            ? "warning"
-                            : "error"
-                        }
-                      />
-
-                    </TableCell>
-
-                    <TableCell align="center">
-
-                      <Button
-                        size="small"
-                        variant="outlined"
-                        onClick={() =>
-                          handleEdit(stream)
-                        }
-                        sx={{
-                          mr: 1,
-                        }}
-                      >
-                        Edit
-                      </Button>
-
-                      <Button
-                        size="small"
-                        color="error"
-                        variant="contained"
-                        onClick={() =>
-                          handleDelete(stream.id)
-                        }
-                      >
-                        Delete
-                      </Button>
-
-                    </TableCell>
-
-                  </TableRow>
-
-                ))
-
-              )}
-
-            </TableBody>
-
-          </Table>
-
-        </TableContainer>
-
-      </Paper>
-
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={3000}
-        onClose={handleSnackbarClose}
-      >
-
+      {error && (
         <Alert
-          severity={snackbar.severity}
-          onClose={handleSnackbarClose}
+          severity="error"
           sx={{
-            width: "100%",
+            mb: 3,
+            borderRadius: 3,
           }}
         >
-          {snackbar.message}
+          {error}
         </Alert>
+      )}
 
-      </Snackbar>
+      {/* LOADING */}
 
-    </>
+      {loading ? (
+        <Box
+          sx={{
+            minHeight: 300,
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <CircularProgress />
+        </Box>
+      ) : filteredStreams.length === 0 ? (
+        <Box
+          sx={{
+            p: 6,
+            textAlign: "center",
+            bgcolor: "#fff",
+            border: "1px solid #E2E8F0",
+            borderRadius: 4,
+          }}
+        >
+          <Typography
+            variant="h6"
+            fontWeight={800}
+            color="#334155"
+          >
+            No cameras found
+          </Typography>
 
+          <Typography
+            color="#94A3B8"
+            sx={{ mt: 1 }}
+          >
+            No configured streams match your search.
+          </Typography>
+        </Box>
+      ) : (
+        /* STREAM GRID */
+
+        <Grid container spacing={3}>
+          {filteredStreams.map((stream) => (
+            <Grid
+              key={stream.id}
+              size={{
+                xs: 12,
+                md: 6,
+                lg: 4,
+              }}
+            >
+              <StreamCard
+                stream={stream}
+                actionLoading={actionLoading}
+                onStart={handleStart}
+                onStop={handleStop}
+              />
+            </Grid>
+          ))}
+        </Grid>
+      )}
+    </Box>
   );
-
 }
 
 export default StreamManagement;

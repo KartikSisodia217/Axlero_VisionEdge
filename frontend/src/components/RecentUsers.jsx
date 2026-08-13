@@ -2,100 +2,281 @@ import {
   Card,
   CardContent,
   Typography,
-  Table,
-  TableHead,
-  TableBody,
-  TableRow,
-  TableCell,
+  Box,
+  Avatar,
   Chip,
 } from "@mui/material";
 
-const users = [
-  {
-    id: 1,
-    name: "Rajesh Reddy",
-    email: "rajesh@gmail.com",
-    status: "Active",
-  },
-  {
-    id: 2,
-    name: "Karthik",
-    email: "karthik@gmail.com",
-    status: "Active",
-  },
-  {
-    id: 3,
-    name: "Rahul",
-    email: "rahul@gmail.com",
-    status: "Inactive",
-  },
-];
+import PeopleIcon from "@mui/icons-material/People";
+import VerifiedUserIcon from "@mui/icons-material/VerifiedUser";
 
-function RecentUsers() {
+function RecentUsers({ users = [] }) {
   return (
     <Card
+      elevation={0}
       sx={{
+        height: "100%",
         borderRadius: 4,
-        mt: 3,
+        background: "#FFFFFF",
+        border: "1px solid #E2E8F0",
+        boxShadow:
+          "0 8px 24px rgba(15, 23, 42, 0.06)",
       }}
     >
-      <CardContent>
+      <CardContent
+        sx={{
+          p: 3,
+          "&:last-child": {
+            pb: 3,
+          },
+        }}
+      >
+        {/* Header */}
 
-        <Typography
-          variant="h6"
-          fontWeight="bold"
-          mb={2}
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            mb: 3,
+          }}
         >
-          Recent Users
-        </Typography>
+          <Box>
+            <Typography
+              variant="h6"
+              fontWeight={800}
+              sx={{
+                color: "#0F172A",
+              }}
+            >
+              Recent Users
+            </Typography>
 
-        <Table>
+            <Typography
+              variant="body2"
+              sx={{
+                mt: 0.5,
+                color: "#64748B",
+              }}
+            >
+              Active platform users
+            </Typography>
+          </Box>
 
-          <TableHead>
+          <Box
+            sx={{
+              width: 42,
+              height: 42,
+              borderRadius: 2.5,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              backgroundColor: "#EFF6FF",
+              color: "#2563EB",
+            }}
+          >
+            <PeopleIcon />
+          </Box>
+        </Box>
 
-            <TableRow>
+        {/* Users */}
 
-              <TableCell><b>Name</b></TableCell>
+        {users.length === 0 ? (
+          <Box
+            sx={{
+              py: 6,
+              textAlign: "center",
+            }}
+          >
+            <PeopleIcon
+              sx={{
+                fontSize: 42,
+                color: "#94A3B8",
+                mb: 1,
+              }}
+            />
 
-              <TableCell><b>Email</b></TableCell>
+            <Typography
+              color="text.secondary"
+            >
+              No users available
+            </Typography>
+          </Box>
+        ) : (
+          <Box>
+            {users.map((user, index) => {
+              const online =
+                user.status?.toLowerCase() ===
+                "online";
 
-              <TableCell><b>Status</b></TableCell>
+              const initials = user.name
+                ? user.name
+                    .split(" ")
+                    .map((part) => part[0])
+                    .join("")
+                    .slice(0, 2)
+                    .toUpperCase()
+                : "U";
 
-            </TableRow>
+              return (
+                <Box
+                  key={`${user.name}-${index}`}
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 1.5,
+                    py: 1.7,
 
-          </TableHead>
+                    borderBottom:
+                      index !== users.length - 1
+                        ? "1px solid #E2E8F0"
+                        : "none",
+                  }}
+                >
+                  {/* Avatar */}
 
-          <TableBody>
+                  <Box
+                    sx={{
+                      position: "relative",
+                    }}
+                  >
+                    <Avatar
+                      sx={{
+                        width: 44,
+                        height: 44,
+                        backgroundColor:
+                          "#DBEAFE",
+                        color: "#1D4ED8",
+                        fontWeight: 800,
+                        fontSize: "0.85rem",
+                      }}
+                    >
+                      {initials}
+                    </Avatar>
 
-            {users.map((user) => (
+                    <Box
+                      sx={{
+                        position: "absolute",
+                        right: -1,
+                        bottom: -1,
+                        width: 11,
+                        height: 11,
+                        borderRadius: "50%",
+                        backgroundColor:
+                          online
+                            ? "#10B981"
+                            : "#94A3B8",
+                        border:
+                          "2px solid #FFFFFF",
+                      }}
+                    />
+                  </Box>
 
-              <TableRow key={user.id}>
+                  {/* User Details */}
 
-                <TableCell>{user.name}</TableCell>
+                  <Box
+                    sx={{
+                      flex: 1,
+                      minWidth: 0,
+                    }}
+                  >
+                    <Typography
+                      fontWeight={800}
+                      fontSize="0.9rem"
+                      sx={{
+                        color: "#0F172A",
+                      }}
+                    >
+                      {user.name}
+                    </Typography>
 
-                <TableCell>{user.email}</TableCell>
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        color: "#64748B",
+                      }}
+                    >
+                      {user.role}
+                    </Typography>
 
-                <TableCell>
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        display: "block",
+                        mt: 0.2,
+                        color: "#94A3B8",
+                      }}
+                    >
+                      {user.last_seen}
+                    </Typography>
+                  </Box>
+
+                  {/* Detection Count */}
+
+                  <Box
+                    sx={{
+                      textAlign: "right",
+                    }}
+                  >
+                    <Typography
+                      fontWeight={800}
+                      fontSize="0.9rem"
+                      sx={{
+                        color: "#2563EB",
+                      }}
+                    >
+                      {user.detections}
+                    </Typography>
+
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        color: "#94A3B8",
+                      }}
+                    >
+                      detections
+                    </Typography>
+                  </Box>
+
+                  {/* Status */}
 
                   <Chip
-                    label={user.status}
-                    color={
-                      user.status === "Active"
-                        ? "success"
-                        : "error"
+                    icon={
+                      online ? (
+                        <VerifiedUserIcon
+                          sx={{
+                            fontSize:
+                              "14px !important",
+                          }}
+                        />
+                      ) : undefined
                     }
+                    label={
+                      online
+                        ? "Online"
+                        : "Offline"
+                    }
+                    size="small"
+                    sx={{
+                      display: {
+                        xs: "none",
+                        sm: "flex",
+                      },
+                      fontWeight: 700,
+                      backgroundColor:
+                        online
+                          ? "#ECFDF5"
+                          : "#F1F5F9",
+                      color: online
+                        ? "#047857"
+                        : "#64748B",
+                    }}
                   />
-
-                </TableCell>
-
-              </TableRow>
-
-            ))}
-
-          </TableBody>
-
-        </Table>
-
+                </Box>
+              );
+            })}
+          </Box>
+        )}
       </CardContent>
     </Card>
   );

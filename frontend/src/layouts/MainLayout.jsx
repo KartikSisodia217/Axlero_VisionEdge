@@ -1,71 +1,107 @@
 import { useState } from "react";
-import { Box } from "@mui/material";
+
+import {
+  Box,
+} from "@mui/material";
 
 import Sidebar from "../components/Sidebar";
 import Topbar from "../components/Topbar";
 
 import Dashboard from "../pages/Dashboard";
-import UserManagement from "../components/UserManagement";
-import StreamManagement from "../components/StreamManagement";
-
-import Analytics from "../pages/Analytics";
-import Logs from "../pages/Logs";
+import Streams from "../pages/Streams";
+import CameraMonitoring from "../pages/CameraMonitoring";
+import SecurityAlerts from "../pages/SecurityAlerts";
+import ActivityLogs from "../pages/ActivityLogs";
+import RealTimeMonitoringPage from "../pages/RealTimeMonitoringPage";
 import Settings from "../pages/Settings";
+import UserProfile from "../pages/UserProfile";
 
 function MainLayout() {
-  const [activePage, setActivePage] = useState("dashboard");
+  const [activePage, setActivePage] =
+    useState("dashboard");
 
-  function renderPage() {
+  const renderPage = () => {
     switch (activePage) {
       case "dashboard":
         return <Dashboard />;
 
-      case "users":
-        return <UserManagement />;
-
       case "streams":
-        return <StreamManagement />;
+        return <Streams />;
 
-      case "analytics":
-        return <Analytics />;
+      case "camera-monitoring":
+        return <CameraMonitoring />;
 
-      case "logs":
-        return <Logs />;
+      case "security-alerts":
+        return <SecurityAlerts />;
+
+      case "activity-logs":
+        return <ActivityLogs />;
+
+      case "real-time-monitoring":
+        return <RealTimeMonitoringPage />;
 
       case "settings":
         return <Settings />;
 
+      case "user":
+        return <UserProfile />;
+
       default:
         return <Dashboard />;
     }
-  }
+  };
 
   return (
     <Box
       sx={{
         display: "flex",
+        width: "100%",
         minHeight: "100vh",
-        backgroundColor: "#f4f6f9",
+        bgcolor: "background.default",
+        color: "text.primary",
+        transition:
+          "background-color 0.25s ease, color 0.25s ease",
       }}
     >
+      {/* SIDEBAR */}
+
       <Sidebar
         activePage={activePage}
         setActivePage={setActivePage}
       />
 
+      {/* MAIN AREA */}
+
       <Box
         sx={{
           flex: 1,
+          minWidth: 0,
+          minHeight: "100vh",
           display: "flex",
           flexDirection: "column",
+          bgcolor: "background.default",
+          transition:
+            "background-color 0.25s ease",
         }}
       >
-        <Topbar />
+        {/* TOPBAR */}
+
+        <Topbar
+          setActivePage={setActivePage}
+        />
+
+        {/* PAGE CONTENT */}
 
         <Box
+          component="main"
           sx={{
             flex: 1,
-            p: 3,
+            width: "100%",
+            minWidth: 0,
+            bgcolor: "background.default",
+            overflow: "auto",
+            transition:
+              "background-color 0.25s ease",
           }}
         >
           {renderPage()}

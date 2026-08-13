@@ -2,82 +2,171 @@ import {
   Card,
   CardContent,
   Typography,
-  LinearProgress,
   Box,
+  LinearProgress,
 } from "@mui/material";
 
-function HealthItem({ title, value, color }) {
+function HealthRow({ label, value }) {
+  const getColor = () => {
+    if (value >= 85) return "#EF4444";
+    if (value >= 70) return "#F59E0B";
+    return "#10B981";
+  };
+
   return (
-    <Box sx={{ mb: 3 }}>
-      <Typography fontWeight="bold">
-        {title}
-      </Typography>
+    <Box sx={{ mb: 2.5 }}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          mb: 0.8,
+        }}
+      >
+        <Typography
+          variant="body2"
+          fontWeight={600}
+          sx={{ color: "#475569" }}
+        >
+          {label}
+        </Typography>
+
+        <Typography
+          variant="body2"
+          fontWeight={800}
+          sx={{ color: getColor() }}
+        >
+          {Number(value || 0).toFixed(1)}%
+        </Typography>
+      </Box>
 
       <LinearProgress
         variant="determinate"
-        value={value}
+        value={Math.min(Number(value || 0), 100)}
         sx={{
-          mt: 1,
-          height: 10,
-          borderRadius: 5,
+          height: 8,
+          borderRadius: 10,
+          backgroundColor: "#E2E8F0",
+
           "& .MuiLinearProgress-bar": {
-            backgroundColor: color,
+            borderRadius: 10,
+            backgroundColor: getColor(),
           },
         }}
       />
-
-      <Typography
-        align="right"
-        mt={1}
-      >
-        {value}%
-      </Typography>
     </Box>
   );
 }
 
-function SystemHealth() {
+function SystemHealth({ system }) {
+  const health = system || {};
+
   return (
     <Card
+      elevation={0}
       sx={{
+        height: "100%",
+        minHeight: 440,
         borderRadius: 4,
-        mt: 3,
+        background: "#FFFFFF",
+        border: "1px solid #E2E8F0",
+        boxShadow:
+          "0 8px 24px rgba(15, 23, 42, 0.06)",
       }}
     >
-      <CardContent>
+      <CardContent
+        sx={{
+          p: 3,
+          "&:last-child": {
+            pb: 3,
+          },
+        }}
+      >
+        {/* Header */}
 
-        <Typography
-          variant="h6"
-          fontWeight="bold"
-          mb={3}
+        <Box sx={{ mb: 3 }}>
+          <Typography
+            variant="h6"
+            fontWeight={800}
+            sx={{
+              color: "#0F172A",
+            }}
+          >
+            System Health
+          </Typography>
+
+          <Typography
+            variant="body2"
+            sx={{
+              mt: 0.5,
+              color: "#64748B",
+            }}
+          >
+            Real-time infrastructure utilization
+          </Typography>
+        </Box>
+
+        {/* Overall Status */}
+
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: 1.2,
+            mb: 3,
+            p: 1.5,
+            borderRadius: 3,
+            backgroundColor: "#ECFDF5",
+          }}
         >
-          System Health
-        </Typography>
+          <Box
+            sx={{
+              width: 10,
+              height: 10,
+              borderRadius: "50%",
+              backgroundColor: "#10B981",
+              boxShadow:
+                "0 0 0 4px rgba(16,185,129,0.12)",
+            }}
+          />
 
-        <HealthItem
-          title="CPU Usage"
-          value={42}
-          color="#2563EB"
+          <Typography
+            variant="body2"
+            fontWeight={700}
+            sx={{
+              color: "#047857",
+            }}
+          >
+            Infrastructure Operational
+          </Typography>
+        </Box>
+
+        {/* Metrics */}
+
+        <HealthRow
+          label="CPU Usage"
+          value={health.cpu}
         />
 
-        <HealthItem
-          title="GPU Usage"
-          value={71}
-          color="#10B981"
+        <HealthRow
+          label="GPU Usage"
+          value={health.gpu}
         />
 
-        <HealthItem
-          title="RAM Usage"
-          value={63}
-          color="#F59E0B"
+        <HealthRow
+          label="Memory Usage"
+          value={health.memory}
         />
 
-        <HealthItem
-          title="Disk Usage"
-          value={38}
-          color="#8B5CF6"
+        <HealthRow
+          label="Storage Usage"
+          value={health.storage}
         />
 
+        <HealthRow
+          label="Network Usage"
+          value={health.network}
+        />
       </CardContent>
     </Card>
   );

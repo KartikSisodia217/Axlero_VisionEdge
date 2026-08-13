@@ -1,175 +1,217 @@
 import {
-  ResponsiveContainer,
-  AreaChart,
-  Area,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-} from "recharts";
-
-import {
   Card,
   CardContent,
   Typography,
   Box,
 } from "@mui/material";
 
-import { motion } from "framer-motion";
+import {
+  ResponsiveContainer,
+  AreaChart,
+  Area,
+  CartesianGrid,
+  XAxis,
+  YAxis,
+  Tooltip,
+} from "recharts";
 
-const data = [
-  { day: "Mon", users: 12, streams: 5 },
-  { day: "Tue", users: 20, streams: 8 },
-  { day: "Wed", users: 28, streams: 12 },
-  { day: "Thu", users: 35, streams: 15 },
-  { day: "Fri", users: 45, streams: 18 },
-  { day: "Sat", users: 55, streams: 20 },
-  { day: "Sun", users: 70, streams: 25 },
-];
-
-function AnalyticsChart() {
+function AnalyticsChart({ data = [] }) {
   return (
-    <motion.div
-      initial={{
-        opacity: 0,
-        y: 40,
-      }}
-      animate={{
-        opacity: 1,
-        y: 0,
-      }}
-      transition={{
-        duration: 0.6,
+    <Card
+      elevation={0}
+      sx={{
+        height: "100%",
+        minHeight: 440,
+        borderRadius: 4,
+        background: "#FFFFFF",
+        border: "1px solid #E2E8F0",
+        boxShadow:
+          "0 8px 24px rgba(15, 23, 42, 0.06)",
       }}
     >
-      <Card
+      <CardContent
         sx={{
-          borderRadius: 5,
-          boxShadow:
-            "0 12px 30px rgba(0,0,0,0.08)",
+          p: 3,
+          "&:last-child": {
+            pb: 3,
+          },
         }}
       >
-        <CardContent>
+        {/* Header */}
+
+        <Box
+          sx={{
+            mb: 3,
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "flex-start",
+          }}
+        >
+          <Box>
+            <Typography
+              variant="h6"
+              fontWeight={800}
+              sx={{
+                color: "#0F172A",
+              }}
+            >
+              Weekly Detection Trend
+            </Typography>
+
+            <Typography
+              variant="body2"
+              sx={{
+                mt: 0.5,
+                color: "#64748B",
+              }}
+            >
+              AI detections over the last 7 days
+            </Typography>
+          </Box>
 
           <Box
-            display="flex"
-            justifyContent="space-between"
-            mb={3}
+            sx={{
+              px: 1.5,
+              py: 0.7,
+              borderRadius: 2,
+              background: "#EFF6FF",
+              color: "#2563EB",
+            }}
           >
-            <Box>
+            <Typography
+              variant="caption"
+              fontWeight={700}
+            >
+              LIVE
+            </Typography>
+          </Box>
+        </Box>
 
-              <Typography
-                variant="h5"
-                fontWeight="bold"
+        {/* Chart */}
+
+        <Box
+          sx={{
+            width: "100%",
+            height: 320,
+          }}
+        >
+          {data.length > 0 ? (
+            <ResponsiveContainer
+              width="100%"
+              height="100%"
+            >
+              <AreaChart
+                data={data}
+                margin={{
+                  top: 10,
+                  right: 10,
+                  left: -15,
+                  bottom: 0,
+                }}
               >
-                Weekly Analytics
-              </Typography>
+                <defs>
+                  <linearGradient
+                    id="visionEdgeGradient"
+                    x1="0"
+                    y1="0"
+                    x2="0"
+                    y2="1"
+                  >
+                    <stop
+                      offset="0%"
+                      stopColor="#2563EB"
+                      stopOpacity={0.35}
+                    />
 
+                    <stop
+                      offset="100%"
+                      stopColor="#2563EB"
+                      stopOpacity={0.02}
+                    />
+                  </linearGradient>
+                </defs>
+
+                <CartesianGrid
+                  stroke="#E2E8F0"
+                  strokeDasharray="4 4"
+                  vertical={false}
+                />
+
+                <XAxis
+                  dataKey="day"
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{
+                    fill: "#64748B",
+                    fontSize: 12,
+                  }}
+                  dy={10}
+                />
+
+                <YAxis
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{
+                    fill: "#64748B",
+                    fontSize: 12,
+                  }}
+                />
+
+                <Tooltip
+                  contentStyle={{
+                    borderRadius: 12,
+                    border: "1px solid #E2E8F0",
+                    boxShadow:
+                      "0 8px 20px rgba(15,23,42,0.10)",
+                    background: "#FFFFFF",
+                  }}
+                  labelStyle={{
+                    color: "#0F172A",
+                    fontWeight: 700,
+                  }}
+                />
+
+                <Area
+                  type="monotone"
+                  dataKey="detections"
+                  stroke="#2563EB"
+                  strokeWidth={3}
+                  fill="url(#visionEdgeGradient)"
+                  dot={{
+                    r: 4,
+                    fill: "#FFFFFF",
+                    stroke: "#2563EB",
+                    strokeWidth: 2,
+                  }}
+                  activeDot={{
+                    r: 6,
+                    fill: "#2563EB",
+                    stroke: "#FFFFFF",
+                    strokeWidth: 3,
+                  }}
+                  animationDuration={1200}
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          ) : (
+            <Box
+              sx={{
+                height: "100%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
               <Typography
                 color="text.secondary"
               >
-                Users & Stream Growth
+                No detection data available
               </Typography>
-
             </Box>
-          </Box>
-
-          <ResponsiveContainer
-            width="100%"
-            height={360}
-          >
-
-            <AreaChart data={data}>
-
-              <defs>
-
-                <linearGradient
-                  id="users"
-                  x1="0"
-                  y1="0"
-                  x2="0"
-                  y2="1"
-                >
-
-                  <stop
-                    offset="5%"
-                    stopColor="#2563EB"
-                    stopOpacity={0.8}
-                  />
-
-                  <stop
-                    offset="95%"
-                    stopColor="#2563EB"
-                    stopOpacity={0}
-                  />
-
-                </linearGradient>
-
-                <linearGradient
-                  id="streams"
-                  x1="0"
-                  y1="0"
-                  x2="0"
-                  y2="1"
-                >
-
-                  <stop
-                    offset="5%"
-                    stopColor="#10B981"
-                    stopOpacity={0.8}
-                  />
-
-                  <stop
-                    offset="95%"
-                    stopColor="#10B981"
-                    stopOpacity={0}
-                  />
-
-                </linearGradient>
-
-              </defs>
-
-              <CartesianGrid
-                strokeDasharray="3 3"
-                stroke="#E5E7EB"
-              />
-
-              <XAxis dataKey="day" />
-
-              <YAxis />
-
-              <Tooltip />
-
-              <Legend />
-
-              <Area
-                type="monotone"
-                dataKey="users"
-                stroke="#2563EB"
-                strokeWidth={3}
-                fillOpacity={1}
-                fill="url(#users)"
-              />
-
-              <Area
-                type="monotone"
-                dataKey="streams"
-                stroke="#10B981"
-                strokeWidth={3}
-                fillOpacity={1}
-                fill="url(#streams)"
-              />
-
-            </AreaChart>
-
-          </ResponsiveContainer>
-
-        </CardContent>
-
-      </Card>
-
-    </motion.div>
+          )}
+        </Box>
+      </CardContent>
+    </Card>
   );
 }
 
